@@ -1,0 +1,22 @@
+Package: dprocsim
+Type: Package
+Title: Distribution Estimation Accounting for Prior Uncertainty in a Bayesian Analysis
+Version: 0.1.0
+Authors@R: person("Sam", "Tyner", email = "sctyner90@gmail.com",
+                  role = c("aut", "cre"))
+Description: Simulate distribution functions from Dirichlet Process priors 
+    when the distribution of data is unknown. Then, using the conjugacy
+    of the DPP, simulate from the posterior after data. Finally, approximate
+    the posterior density with intervals around values in the range. 
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 3.5.0)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
+Imports: 
+    magrittr,
+    dplyr, 
+    purrr,
+    tibble,
+    tidyr
