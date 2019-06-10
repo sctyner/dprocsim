@@ -12,7 +12,7 @@
 #' @importFrom tidyr unnest
 #' @importFrom dplyr filter
 #'
-#'
+#' @export
 eval_dens <- function(x, epsilon, sims, ...) {
   passing_sims <- sims %>%
     unnest() %>%
