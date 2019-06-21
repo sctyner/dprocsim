@@ -9,7 +9,7 @@ dppost_sim(M, F0, sticks, dat, ...)
 \arguments{
 \item{M}{An integer. The precision parameter in a Dirichlet Process Prior.}
 
-\item{F0}{A character. Name of the function for simulating from the desired centering base measure.}
+\item{F0}{Either a function or a non-empty character string naming the function to be called.}
 
 \item{sticks}{An integer. The number of sticks to break when simulating from DP(M, F0) using the stick breaking construction.}
 

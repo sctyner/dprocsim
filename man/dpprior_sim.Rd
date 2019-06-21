@@ -9,7 +9,7 @@ dpprior_sim(M, F0, sticks, ...)
 \arguments{
 \item{M}{An integer. The precision parameter in a Dirichlet Process Prior.}
 
-\item{F0}{A character. Name of the function for simulating from the desired centering base measure.}
+\item{F0}{Either a function or a non-empty character string naming the function to be called.}
 
 \item{sticks}{An integer. The number of sticks to break when simulating from DP(M, F0) using the stick breaking construction.}
 
@@ -21,5 +21,5 @@ Simulate from a DP Prior
 \examples{
 
 beta1 <- dpprior_sim(M = 4, F0 = "rbeta", sticks = 100, shape1 = 4, shape2 = 1)
-norm1 <- dpprior_sim(M = 1, F0 = "rnorm", sticks = 50, mean = 1, sd = .01)
+norm1 <- dpprior_sim(M = 1, F0 = rnorm, sticks = 50, mean = 1, sd = .01)
 }

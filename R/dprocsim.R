@@ -10,4 +10,5 @@ NULL
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("locations", "weights",
                                                         "weights2", "in_interval",
                                                         "weCDF", "max_cdf",
-                                                        "min_cdf", "dens_est"))
+                                                        "min_cdf", "dens_est", "x", "y", "monotone",
+                                                        "bound", "method", "xgrid", "new.xs", "new.ys"))

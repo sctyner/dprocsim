@@ -1,7 +1,7 @@
 #' Simulate from a DP Prior
 #'
 #' @param M An integer. The precision parameter in a Dirichlet Process Prior.
-#' @param F0 A character. Name of the function for simulating from the desired centering base measure.
+#' @param F0 Either a function or a non-empty character string naming the function to be called.
 #' @param ... Named arguments to pass to to the centering function.
 #' @param sticks An integer. The number of sticks to break when simulating from DP(M, F0) using the stick breaking construction.
 #'
@@ -11,7 +11,7 @@
 #' @examples
 #'
 #' beta1 <- dpprior_sim(M = 4, F0 = "rbeta", sticks = 100, shape1 = 4, shape2 = 1)
-#' norm1 <- dpprior_sim(M = 1, F0 = "rnorm", sticks = 50, mean = 1, sd = .01)
+#' norm1 <- dpprior_sim(M = 1, F0 = rnorm, sticks = 50, mean = 1, sd = .01)
 #' @export
 dpprior_sim <- function(M, F0, sticks, ...) {
   # stack exchange code
@@ -42,7 +42,8 @@ dpprior_sim <- function(M, F0, sticks, ...) {
 #' @param N An integer. The number of distributions to simulate for each value of `M`.
 #' @param ... Named arguments to pass to to the centering function.
 #' @importFrom tibble as_tibble
-#' @importFrom purrr map2
+#' @importFrom purrr map
+#' @importFrom rlang f_text
 #'
 #' @description Obtain repeated draws from a (set of) given DP priors.
 #'
@@ -50,15 +51,15 @@ dpprior_sim <- function(M, F0, sticks, ...) {
 #' M <- 1:2
 #' F0 <- "rbeta"
 #'
-#' dpprior_sim2(M = M, F0 = F0, sticks = 100, N = 10, shape1 = 4, shape2 = 1)
+#' dpprior_sim2(M = M, F0 = rbeta, sticks = 100, N = 10, shape1 = 4, shape2 = 1)
 #' @export
 dpprior_sim2 <- function(M, F0, sticks, N, ...) {
-  sim_grid <- expand.grid(rep = 1:N, M = M, F0 = F0, stringsAsFactors = FALSE) %>% as_tibble()
+  sim_grid <- expand.grid(rep = 1:N, M = M, stringsAsFactors = FALSE) %>% as_tibble()
 
   sim_grid %>%
-    mutate(draws = map2(M, F0,
+    mutate(draws = map(M,
       dpprior_sim,
-      sticks = sticks, ...
+      sticks = sticks, F0 = F0, ...
     ))
 }
 
@@ -105,12 +106,13 @@ dppost_sim <- function(M, F0, sticks, dat, ...) {
 #'
 #' @export
 dppost_sim2 <- function(M, F0, sticks, dat, N, ...) {
-  sim_grid <- expand.grid(rep = 1:N, M = M, F0 = F0, stringsAsFactors = FALSE) %>% as_tibble()
+    sim_grid <- expand.grid(rep = 1:N, M = M, stringsAsFactors = FALSE) %>% as_tibble()
+
 
   sim_grid %>%
-    mutate(draws = map2(M, F0,
+    mutate(draws = map(M,
       dppost_sim,
-      sticks = sticks, dat = dat, ...
+      sticks = sticks, dat = dat, F0 = F0, ...
     ))
 }
 

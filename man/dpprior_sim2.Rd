@@ -24,5 +24,5 @@ Obtain repeated draws from a (set of) given DP priors.
 M <- 1:2
 F0 <- "rbeta"
 
-dpprior_sim2(M = M, F0 = F0, sticks = 100, N = 10, shape1 = 4, shape2 = 1)
+dpprior_sim2(M = M, F0 = rbeta, sticks = 100, N = 10, shape1 = 4, shape2 = 1)
 }

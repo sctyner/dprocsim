@@ -53,7 +53,37 @@ in_range <- function(location, fixed_value, epsilon) {
   }
 }
 
+#' Augment a CDF to full domain and range
 #'
+#' @param dat Data frame. The CDF information from `dprocsim::run_shiny()`. Should have columns named `x`, `y`, `bound`, `method`.
+#' @param xrange Numeric. Vector of length 2 giving the minimum and maximum of the function's domain.
+#' @param yrange Numeric. Vector of length 2 giving the minimum and maximum of the fundtion's range. Should be `0:1` for CDF (default).
 #'
-#'
-#'
+#' @importFrom dplyr add_row
+#' @export
+augment_cdf <- function(dat,xrange, yrange = 0:1) {
+  dat2 <-  dat %>% arrange(x) %>% mutate(monotone = y == cummax(y)) %>% filter(monotone)
+
+  bnd <- unique(dat$bound)
+
+  hits_ymin <- min(dat2$y) == yrange[1]
+  hits_ymax <- max(dat2$y) == yrange[2]
+  hits_xmin <- min(dat2$x) == xrange[1]
+  hits_xmax <- max(dat2$x) == xrange[2]
+
+
+  if (hits_ymin & !hits_xmin | !hits_xmin & !hits_ymin) {
+    dat2 <- dat2 %>% add_row(x = xrange[1], y = yrange[1], bound = bnd, method = "augmented")
+  }
+  if (hits_ymax & !hits_xmax | !hits_xmax & !hits_ymax) {
+    dat2 <- dat2 %>% add_row(x = xrange[2], y = yrange[2], bound = bnd, method = "augmented")
+  }
+  if (hits_xmax & !hits_ymax) {
+    # if the max x value is present, but it doesn't hit the ymax, replace it
+    dat2[which(dat2$x == xrange[2] & dat2$y == max(dat2$y)),] <- c(xrange[2], yrange[2], bnd, "augmented", NA)
+    dat2 <- mutate(dat2, x = parse_number(x), y = parse_number(y))
+  }
+
+  dat2 %>% arrange(x)
+
+}
