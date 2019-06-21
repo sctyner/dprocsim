@@ -74,6 +74,8 @@ spline_funs <- function(clicks, xrange, spar = .5){
     new <- predict(spline1, xgrid)
     new$y[new$x == xrange[2]] <- 1
     new$y[new$y > 1] <- 1
+    new$y[new$x == xrange[1]] <- 0
+    new$y[new$y < 0] <- 0
     new$y
   }
 }
