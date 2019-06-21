@@ -29,7 +29,8 @@ dpprior_sim <- function(M, F0, sticks, ...) {
     group_by(locations) %>%
     summarize(weights2 = sum(weights)) %>%
     ungroup() %>%
-    mutate(weCDF = cumsum(weights2))
+    mutate(weCDF = cumsum(weights2))%>%
+    mutate(weCDF = weCDF / max(weCDF)) # normalize sticks
 }
 
 
@@ -94,7 +95,8 @@ dppost_sim <- function(M, F0, sticks, dat, ...) {
     group_by(locations) %>%
     summarize(weights2 = sum(weights)) %>%
     ungroup() %>%
-    mutate(weCDF = cumsum(weights2))
+    mutate(weCDF = cumsum(weights2)) %>%
+    mutate(weCDF = weCDF / max(weCDF))
 }
 
 
