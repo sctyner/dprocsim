@@ -57,6 +57,7 @@ drawn_cdf_sim <- function(shinydat, xgrid, ubnd = "bound 1", lbnd = "bound 2", m
 #'
 #' @param clicks Clicked data
 #' @param xrange Vector of length 2 giving the minimum and maximum domain values for the spline function.
+#' @param spar Numeric. Value of the smoothing parameter (between 0-1) to be passed to `smooth.spline()`.
 #'
 #' @description Create linear approximation or spline approximation functions from a given set of points.
 #'
@@ -66,11 +67,12 @@ drawn_cdf_sim <- function(shinydat, xgrid, ubnd = "bound 1", lbnd = "bound 2", m
 #' }
 #'
 #' @export
-spline_funs <- function(clicks, xrange){
+spline_funs <- function(clicks, xrange, spar = .5){
   clicks <- augment_cdf(clicks, xrange = xrange)
-  spline1 <- smooth.spline(x = clicks$x, y = clicks$y, spar = .5)
+  spline1 <- smooth.spline(x = clicks$x, y = clicks$y, spar = spar)
   function(xgrid){
     new <- predict(spline1, xgrid)
+    new$y[new$x == xrange[2]] <- 1
     new$y[new$y > 1] <- 1
     new$y
   }

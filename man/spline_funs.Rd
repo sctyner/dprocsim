@@ -6,7 +6,7 @@
 \alias{mean_funs}
 \title{Helpful closures}
 \usage{
-spline_funs(clicks, xrange)
+spline_funs(clicks, xrange, spar = 0.5)
 
 linear_funs(clicks, xrange)
 
@@ -16,6 +16,8 @@ mean_funs(upper, lower, meth)
 \item{clicks}{Clicked data}
 
 \item{xrange}{Vector of length 2 giving the minimum and maximum domain values for the spline function.}
+
+\item{spar}{Numeric. Value of the smoothing parameter (between 0-1) to be passed to \code{smooth.spline()}.}
 
 \item{upper}{Data frame. The upper bound of points for the cdf}
 
