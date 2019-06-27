@@ -1,0 +1,103 @@
+---
+title: "Using the `dprocsim` Package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{using-dprocsim}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(dprocsim)
+```
+
+## Problem Setup 
+
+Suppose you have a population $\mathcal{X} \subset \mathbb{R}^p$ for some $p \geq 1$ and you are interested in some particular function on that population, $S: \mathcal{X} \to R$ where $R \subset \mathbb{R}^q$, $q \geq 1$. Examples of $S$ include but are not limited to: 
+
+- Population mean: $S(\mathcal{X}) = \mu =  \frac{1}{|\mathcal{X}|} \cdot \sum_{x \in \mathcal{X}} x$
+- Population variance:  $S(\mathcal{X}) = \sigma^2 = \frac{1}{|\mathcal{X}|} \cdot \sum_{x \in \mathcal{X}} (x - \mu)^2$
+- Population distribution: $S(x_0) = Pr(x \leq x_0)$ for $x, x_0 \in \mathcal{X}$
+
+The true form of $S$ is unknown and unknowable. So, you can sample from $\mathcal{X}$ and use statistical methods to get an estimate of $S$. However, a different person also interested in estimating $S$ may arrive at a different estimate than you, even with the same sample $x_1, \dots, x_n \subset \mathcal{X}$. Your estimate $\hat{S}_1$ and another's estimate $\hat{S}_2$ are both members of the set of functions $\mathcal{S}$ on the space $\mathcal{X} \to R$. 
+
+In arriving at your particular estimate $\hat{S}_1$, you almost certainly made a set of assumptions. For example, if $S$ is the population mean, you probably assumed that $x_1, \dots, x_n$ were a representative sample from $\mathcal{X}$. If $x_1, \dots, x_n$ were NOT a representative sample, how would your estimate $\hat{S}_1$ have been different? Was it even reasonable to assume that $x_1, \dots, x_n$ were a representative sample from $\mathcal{X}$ given what you knew about $\mathcal{X}$ before seeing $x_1, \dots, x_n$? 
+
+## Why `dprocsim`? 
+
+The creation of `dprocsim` was motivated by a problem in forensic science. Suppose a crime has been committed in the United States and there is a suspect (call them Mx. X), who has a defense attorney, and there is a prosecutor, whose job it is to prove the suspect committed the crime. The prosecuting and defense attorneys have two disjoint hypotheses ($H_p$, $H_d$) about what occured:
+
+$$H_p: \text{Mx. X committed the crime}$$
+$$H_d: \text{Someone other than Mx. X committed the crime}$$
+
+Given some evidence, $E$, the decision makers (say, jurors or judges) have to decide whether Mx. X committed the crime (guilty verdict) or not (not guilty verdict). The odds that Mx. X is guilty can be written as: 
+
+$$\frac{Pr(H_p | E)}{Pr(H_d | E)}$$
+
+Using Bayes' rule: 
+
+$$\frac{Pr(H_p | E)}{Pr(H_d | E)} = \frac{Pr(E | H_p)}{Pr(E | H_d)} \cdot \frac{Pr(H_p)}{Pr(H_d)}$$
+
+The quantity $\frac{Pr(E | H_p)}{Pr(E | H_d)}$ is the Bayes factor or likelihood ratio. It can also be thought of as the "weight of evidence". In statistics, we may want to re-write it as $\frac{f_p(E)}{f_d(E)}$
+where $f_p$ represents the distribution of possible data observed under the prosecutor's hypothesis, and $f_d$ represents the distribution of possible data observed under the defense's hypothesis. 
+
+Typically, we would want to estimate these two distributions given some other relevant population data $\{p_1, \dots, p_n\} , \{d_1, \dots, d_n\}\in \mathbb{R}^p$ and then predict the value of $f_p, f_d$ for the "new data", $E \in \mathbb{R}^p$. In estimation, whether Bayesian or frequentist, several assumptions are made. For example, suppose we take the frequentist approach: 
+
+1. We may look at the histogram and qqplot of $\{p_1, \dots, p_n\}$ and decide that it looks normal. 
+2. Then we would use maximum likelihood estimation to get estimates of the mean and standard deviation, $\hat{\mu}_p, \hat{\sigma}_p$. 
+3. We'd then "plug and chug" to get $f_p(E | \hat{\mu}_p, \hat{\sigma}_p)$.
+4. Repeat 1-3 for $\{d_1, \dots, d_n\}$. 
+5. Compute $\frac{f_p(E | \hat{\mu}_p, \hat{\sigma}_p)}{f_d(E | \hat{\mu}_d, \hat{\sigma}_d)}$. 
+6. Get some sort of confidence interval around 5. 
+7. Report the confidence interval. 
+
+Now, suppose we take the Bayesian approach. Step 1 would be the same, but we'd replace step 2 with putting priors on the parameters of the normal distribution, and then replace step 3 with computing the posterior predictive distribution and evaluate it at $E$ for each of $f_p$ and $f_d$. Note that in the the Bayesian paradigm, there is no uncertainty in this estimate: all of it has been integrated out. So, there is no step 6 or 7. We'd just report the value of the posterior predictive distributions evaluated at $E$. 
+
+Following the arguments of Lund & Iyer (2017), however, there is a great deal of uncertainty in the frequentist and Bayesian estimates of $f_P(E), f_d(E)$ introduced by the assumptions made about $f_p, f_d$. 
+
+Some of these assumptions are: 
+
+- the form of $f$: we assumed the population distribution was normal based on the histogram of the data. But what are some other reasonable assumptions? How about a Student's $T$ distribution? Another unimodal distribution? A non-parametric distribution? 
+- the priors on the parameters in the Bayesian analysis: why were they chosen? Typically, conjugate priors are chosen, but are there other priors that would be better that are non-conjugate? How diffuse are the priors chosen? Just how diffuse they are is a choice made that reflects the knowledge & assumptions of the analyst. Were those assumptions accurate? Could another reasonable person make different assumptions? (Probably.) 
+- In any case, the assumptions made reflect the analyst's view alone, and no one else's.
+
+Presumably, there are a great deal of possible assumptions that could have been made by another reasonable person conducting the same analysis independently. In the forensic scenario, there could be at least two different analysts: one for the defense and one for the prosecution. Each of these analysts is going to make assumptions based on their own knowledge, and human factors research tells us that they will bring their own biases into the analysis. They could make two different sets of assumptions and arrive at very different likelihood ratios. But which calculation is correct? We have no way of knowing this unless we've analyzed a whole range of possible assumptions and the resulting outcomes. 
+
+This analysis is the goal of `dprocsim`. 
+
+## Dirichlet Process Priors
+
+Suppose we have some data ($p_1, \dots, p_n$) from an unknown distribution ($F_p$)
+
+$$p_1, \dots, p_n | F_p \overset{iid}{\sim} F_p$$
+and we want to make inference about this distribution $F_p$. We propose to do it the Bayesian way and put a prior on $F_p$. But how do you put a prior on a distribution? With a Dirichlet Process Prior. 
+
+The Dirichlet process prior is written as: 
+
+$$F_p \sim DP(M, F_0)$$
+where $M > 0$ is the concentration parameter and $F_0$ is the centering measure. 
+
+### The Stick-breaking construction
+
+
+## Simulating from a DP Prior
+
+`dprocsim` contains two functions to simulate from a Dirichlet process prior: `dpprior_sim` and `dpprior_sim2`. 
+
+- `dpprior_sim` has the following arguments:
+    * `M`: the value of $M$ in the DP prior
+    * `F0`: the function for the centering measure, for example `rnorm` ( `"rnorm"` also acceptable)
+    * `sticks`: number of sticks in the stick-breaking simulation process
+    * `...`
+    
+
+
+
+

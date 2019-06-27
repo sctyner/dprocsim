@@ -2,14 +2,14 @@
 % Please edit documentation in R/check-cdfs.R
 \name{check_cdf_bounds}
 \alias{check_cdf_bounds}
-\alias{check_whole_cdf}
+\alias{check_cdf_whole}
 \alias{check_cdf_many}
 \alias{check_cdf_counts}
 \title{Check CDF values fall in between bounds}
 \usage{
 check_cdf_bounds(dpp_draw, ubf, lbf, x)
 
-check_whole_cdf(dpp_draw, ubf, lbf, xgrid)
+check_cdf_whole(dpp_draw, ubf, lbf, xgrid)
 
 check_cdf_many(dpp_draws, ubf, lbf, xgrid)
 
@@ -43,7 +43,7 @@ Determine regions of random CDFs.
 }
 \section{Functions}{
 \itemize{
-\item \code{check_whole_cdf}: 
+\item \code{check_cdf_whole}: 
 
 \item \code{check_cdf_many}: 
 

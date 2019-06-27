@@ -38,7 +38,7 @@ check_cdf_bounds <- function(dpp_draw, ubf, lbf, x){
 #' @describeIn check_cdf_bounds
 #'
 #' @export
-check_whole_cdf <- function(dpp_draw, ubf, lbf, xgrid){
+check_cdf_whole <- function(dpp_draw, ubf, lbf, xgrid){
   checks <- unlist(map(xgrid, check_cdf_bounds, dpp_draw = dpp_draw, ubf = ubf, lbf = lbf))
   tibble(x = xgrid, region = checks)
 }
@@ -46,14 +46,14 @@ check_whole_cdf <- function(dpp_draw, ubf, lbf, xgrid){
 #' Check many CDFs over a grid of x values
 #'
 #' @param dpp_draws A tibble. The output from `dpprior_sim2()` (or `dppost_sim2()`).
-#' @inheritParams  check_whole_cdf
+#' @inheritParams  check_cdf_whole
 #'
 #' @describeIn check_cdf_bounds
 #'
 #' @export
 check_cdf_many <- function(dpp_draws, ubf, lbf, xgrid){
   dpp_draws %>%
-    mutate(regions = map(draws, check_whole_cdf,
+    mutate(regions = map(draws, check_cdf_whole,
                          ubf = ubf, lbf = lbf, xgrid = xgrid))
 }
 #' Determine regions of random CDFs.
@@ -83,6 +83,7 @@ check_cdf_counts <- function(many_draws_checked, N) {
 #'
 #' @importFrom purrr pmap_lgl
 #'
+#' @export
 check_cdf_regions <- function(cdf_regions, au = .1, bl = .1, bw = .5){
   cdf_regions %>%
   mutate(check3 = pmap_lgl(list(above, below, between),
@@ -91,5 +92,17 @@ check_cdf_regions <- function(cdf_regions, au = .1, bl = .1, bw = .5){
                            })) %>%
     group_by(M) %>% count(check3)
 }
-
+#'
+#' Compute distance from given bounds
+#'
+#' @inheritParams check_cdf_regions
+#'
+#' @export
+check_cdf_dist <- function(cdf_regions, au, bl, bw){
+  cdf_regions %>%
+    mutate(dist_above = ifelse(above >= au, 0, au-above),
+           dist_below = ifelse(below >= bl, 0, bl - below),
+           dist_between = ifelse(between >= bw, 0, bw - between),
+           dist = dist_above + dist_below + dist_between)
+}
 
