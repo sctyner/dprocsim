@@ -161,3 +161,15 @@ F_0_prime <- function(M, F0, sticks, dat, ...) {
   }
   locations
 }
+#'
+#' Simulate from a given empirical CDF.
+#'
+#' @param ecdf Function. The empirical cdf of the data of interest. Output from [stats::edcf()].
+#' @param n Integer. Number of observations to simulate
+#'
+#' @description A wrapper around [stats::quantile()].
+#'
+#' @export
+draw_from_ecdf <- function(ecdf, n){
+  quantile(x = ecdf, probs = runif(n), type = 1)
+}

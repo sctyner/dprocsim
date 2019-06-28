@@ -22,6 +22,10 @@ eval_dens <- function(x, epsilon, sims, ...) {
     )) %>% # other args passed to the function
     filter(in_interval)
 
+  if(nrow(passing_sims) == 0){
+    return(0)
+  }
+
   dens_ests <- passing_sims %>%
     group_by(rep) %>%
     summarize(
